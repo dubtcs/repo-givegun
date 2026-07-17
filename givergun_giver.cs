@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
+using BepInEx.Configuration;
 using HarmonyLib;
+using Photon.Realtime;
 using SingularityGroup.HotReload;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace givegun;
@@ -11,20 +16,37 @@ static class GiveGun_Giver
 {
     private const string ITEM_NAME = "Item Gun Handgun";
 
-    [HarmonyPrefix, HarmonyPatch(nameof(RoundDirector.StartRound))]
-    private static void Start_Prefix()
+    // Sets the purchase records of the item to the number passed into as argument
+    private static void PurchaseItems(string item_name, int count)
     {
-        if (!SemiFunc.IsMainMenu() && SemiFunc.IsMasterClientOrSingleplayer())
+        Dictionary<string, int> purchased = StatsManager.instance.itemsPurchased;
+        int item_count = purchased.GetValueOrDefault(item_name, 0);
+        purchased[ITEM_NAME] = Math.Max(count, item_count);
+    }
+
+    private static void SetItemMax(string item_name, int count)
+    {
+        Item[] items = Resources.FindObjectsOfTypeAll<Item>();
+        foreach(Item i in items)
         {
-            Dictionary<string, int> purchased = StatsManager.instance.itemsPurchased;
-            int player_count = Math.Max(1, SemiFunc.PlayerGetList().Count);
-            int item_count = purchased.GetValueOrDefault(ITEM_NAME, 0);
-            purchased[ITEM_NAME] = Math.Max(player_count, item_count);
-            if(player_count < item_count)
+            if(i.name == ITEM_NAME)
             {
-                int dif = player_count - item_count;
-                GiveGun.Logger.LogInfo($"Adding {dif} guns.");
+                i.maxAmount = Math.Max(i.maxAmount, count);
             }
         }
     }
+    
+    [HarmonyPostfix, HarmonyPatch(nameof(RoundDirector.StartRound))]
+    private static void Patcher()
+    {
+        if (SemiFunc.RunIsLevel() && SemiFunc.IsMasterClientOrSingleplayer())
+        {
+            List<PlayerAvatar> players = SemiFunc.PlayerGetList();
+            // Max with 1 accounts for singleplayer
+            int player_count = Math.Max(1, players.Count);
+            SetItemMax(ITEM_NAME, player_count);
+            PurchaseItems(ITEM_NAME, player_count);
+        }
+    }
+
 }

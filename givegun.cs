@@ -16,13 +16,9 @@ public class GiveGun : BaseUnityPlugin
     private void Awake()
     {
         Instance = this;
-        
-        // Prevent the plugin from being deleted
         this.gameObject.transform.parent = null;
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
-
         Patch();
-
         Logger.LogInfo($"{Info.Metadata.GUID} v{Info.Metadata.Version} has loaded!");
     }
 
