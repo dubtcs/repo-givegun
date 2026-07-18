@@ -51,7 +51,7 @@ static class GiveGun_Giver
             foreach(string s in items)
             {
                 List<string> i = s.Split('#').ToList();
-                string item_name = i[0];
+                string item_name = i[0].TrimStart().TrimEnd();
                 int count = (i.Count > 1 && int.TryParse(i[1], out count)) ? count : player_count;
                 GiveGun.Logger.LogMessage($"Giving {count} {item_name}.");
                 SetItemMax(item_name);
