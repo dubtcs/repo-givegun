@@ -25,14 +25,16 @@ static class GiveGun_Giver
         purchased[item_name] = Math.Max(count, item_count);
     }
 
-    private static void SetItemMax(string item_name, int count)
+    private static void SetItemMax(string item_name)
     {
+        if(GiveGun.item_count.Value == 0)
+            return;
         Item[] items = Resources.FindObjectsOfTypeAll<Item>();
         foreach(Item i in items)
         {
             if(i.name == item_name)
             {
-                i.maxAmount = Math.Max(i.maxAmount, count);
+                i.maxAmount = Math.Max(i.maxAmount, GiveGun.item_count.Value);
             }
         }
     }
@@ -52,7 +54,7 @@ static class GiveGun_Giver
                 string item_name = i[0];
                 int count = (i.Count > 1 && int.TryParse(i[1], out count)) ? count : player_count;
                 GiveGun.Logger.LogMessage($"Giving {count} {item_name}.");
-                SetItemMax(item_name, count);
+                SetItemMax(item_name);
                 PurchaseItems(item_name, count);
             }
         }

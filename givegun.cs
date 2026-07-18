@@ -15,6 +15,7 @@ public class GiveGun : BaseUnityPlugin
     internal Harmony? Harmony { get; set; }
 
     public static ConfigEntry<string> item_list;
+    public static ConfigEntry<int> item_count;
 
     private void Awake()
     {
@@ -22,6 +23,7 @@ public class GiveGun : BaseUnityPlugin
         this.gameObject.transform.parent = null;
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
         item_list = Config.Bind("Items", "ItemList", "Item Gun Handgun", "A list of items you want to start with separated by a semicolon. Use a hash to denote quantity. Items without quantity will be spawned for each player.");
+        item_count = Config.Bind("Items", "ItemMaxOverride", 4, new ConfigDescription("The max amount of each item instance allowed to be spawned.", new AcceptableValueRange<int>(0, int.MaxValue)));
         Patch();
         Logger.LogInfo($"{Info.Metadata.GUID} v{Info.Metadata.Version} has loaded!");
     }
