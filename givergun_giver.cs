@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
-using SingularityGroup.HotReload;
 using UnityEngine;
 
 namespace givegun;
@@ -10,16 +9,14 @@ namespace givegun;
 [HarmonyPatch(typeof(RunManager))]
 static class GiveGun_Giver
 {
-    private static void SetItemMax(string item_name)
+    private static void SetItemMax(string item_name, int count)
     {
-        if (GiveGun.item_count.Value == 0)
-            return;
         Item[] items = Resources.FindObjectsOfTypeAll<Item>();
         foreach (Item i in items)
         {
             if (i.name == item_name)
             {
-                i.maxAmount = Math.Max(i.maxAmount, GiveGun.item_count.Value);
+                i.maxAmount = Math.Max(i.maxAmount, count);
             }
         }
     }
@@ -48,7 +45,7 @@ static class GiveGun_Giver
                     string item_name = i[0].TrimStart().TrimEnd();
                     int count = (i.Count > 1 && int.TryParse(i[1], out count)) ? count : player_count;
                     GiveGun.Logger.LogMessage($"Giving {count} {item_name}.");
-                    SetItemMax(item_name);
+                    SetItemMax(item_name, count);
                     PurchaseItems(item_name, count);
                 }
             }
