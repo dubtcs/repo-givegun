@@ -40,7 +40,6 @@ static class GiveGun_Giver
             }
             if (SemiFunc.RunIsLevel() && RunManager.instance.loadLevel == 0)
             {
-                GiveGun.Logger.LogMessage($"First round, supplying loadout.");
                 List<PlayerAvatar> players = SemiFunc.PlayerGetList();
                 int player_count = Math.Max(1, players.Count); // Use max and 1 here to cover offline SP bc idk if GetPlayerList() works there
                 foreach (KeyValuePair<string, int> p in GiveGun.loadout)
@@ -48,8 +47,6 @@ static class GiveGun_Giver
                     if (p.Value != 0)
                     {
                         int count = p.Value > 0 ? p.Value : player_count;
-                        GiveGun.Logger.LogMessage($"Giving {count} {p.Key}.");
-                        // SetItemMax(p.Key, count);
                         PurchaseItems(p.Key, count);
                     }
                 }

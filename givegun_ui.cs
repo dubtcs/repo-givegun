@@ -10,22 +10,25 @@ static class GiveGun_UI
 {
     static private void FetchItems()
     {
-        if (GiveGun.mod_enabled.Value && SemiFunc.IsMasterClientOrSingleplayer() && (GiveGun.loadout.Count == 0))
+        if (GiveGun.mod_enabled.Value && SemiFunc.IsMasterClientOrSingleplayer())
         {
-            GiveGun.Logger.LogMessage("Logging items.");
-            GiveGun.loadout = [];
-            foreach (string s in StatsManager.instance.itemDictionary.Keys)
+            if (GiveGun.loadout.Count == 0)
             {
-                GiveGun.loadout[s] = 0;
+                GiveGun.Logger.LogMessage("Logging items.");
+                GiveGun.loadout = [];
+                foreach (string s in StatsManager.instance.itemDictionary.Keys)
+                {
+                    GiveGun.loadout[s] = 0;
+                }
             }
             // Updating to match current loadout in config
-            List<string> items = GiveGun.item_list.Value.Split(';').ToList();
+            string[] items = GiveGun.item_list.Value.Split(';');
             foreach (string s in items)
             {
                 List<string> i = s.Split('#').ToList();
                 string item_name = i[0].TrimStart().TrimEnd();
                 int count = (i.Count > 1 && int.TryParse(i[1], out count)) ? count : -1;
-                GiveGun.loadout[s] = count;
+                GiveGun.loadout[i[0]] = count;
             }
         }
     }
@@ -44,7 +47,6 @@ static class GiveGun_UI
         {
             menu.AddElementToScrollView(view =>
             {
-                GiveGun.Logger.LogMessage($"Default {GiveGun.loadout[s]}");
                 REPOSlider slider = MenuAPI.CreateREPOSlider(s, string.Empty, nv =>
                 {
                     int value = GiveGun.loadout[s];
