@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using HarmonyLib;
 using UnityEngine;
 
@@ -9,6 +8,7 @@ namespace givegun;
 [HarmonyPatch(typeof(RunManager))]
 static class GiveGun_Giver
 {
+    private const int ITEM_COUNT = 30;
     private static void SetItemMax(string item_name, int count)
     {
         Item[] items = Resources.FindObjectsOfTypeAll<Item>();
@@ -33,6 +33,11 @@ static class GiveGun_Giver
     {
         if (GiveGun.mod_enabled.Value && SemiFunc.IsMasterClientOrSingleplayer())
         {
+            // Do this regardless to make sure no existing loadouts are messed up
+            foreach (KeyValuePair<string, Item> p in StatsManager.instance.itemDictionary)
+            {
+                SetItemMax(p.Key, ITEM_COUNT);
+            }
             if (SemiFunc.RunIsLevel() && RunManager.instance.loadLevel == 0)
             {
                 GiveGun.Logger.LogMessage($"First round, supplying loadout.");
@@ -44,7 +49,7 @@ static class GiveGun_Giver
                     {
                         int count = p.Value > 0 ? p.Value : player_count;
                         GiveGun.Logger.LogMessage($"Giving {count} {p.Key}.");
-                        SetItemMax(p.Key, count);
+                        // SetItemMax(p.Key, count);
                         PurchaseItems(p.Key, count);
                     }
                 }

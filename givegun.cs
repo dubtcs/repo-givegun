@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace givegun;
 
-[BepInPlugin("plspls.Loadout", "Loadout", "1.3.0")]
+[BepInPlugin("plspls.Loadout", "Loadout", "1.3.1")]
 public class GiveGun : BaseUnityPlugin
 {
     internal static GiveGun Instance { get; private set; } = null!;
