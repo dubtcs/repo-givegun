@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
+using WebSocketSharp;
 
 namespace givegun;
 
@@ -23,9 +24,13 @@ static class GiveGun_Giver
 
     private static void PurchaseItems(string item_name, int count)
     {
-        Dictionary<string, int> purchased = StatsManager.instance.itemsPurchased;
-        int item_count = purchased.GetValueOrDefault(item_name, 0);
-        purchased[item_name] = Math.Max(count, item_count);
+        if (!item_name.IsNullOrEmpty())
+        {
+            Dictionary<string, int> purchased = StatsManager.instance.itemsPurchased;
+            int item_count = purchased.GetValueOrDefault(item_name, 0);
+            purchased[item_name] = Math.Max(count, item_count);
+            GiveGun.Logger.LogMessage($"Spawning {count} {item_name}.");
+        }
     }
 
     [HarmonyPostfix, HarmonyPatch(nameof(RunManager.ChangeLevel))]
