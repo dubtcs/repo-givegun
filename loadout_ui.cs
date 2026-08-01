@@ -15,15 +15,6 @@ static class LoadoutUI
     {
         if (Loadout.mod_enabled.Value && SemiFunc.IsMasterClientOrSingleplayer())
         {
-            // if (Loadout.loadout.Count == 0)
-            // {
-            //     Loadout.Logger.LogMessage("Logging items.");
-            //     Loadout.loadout = [];
-            //     foreach (string s in StatsManager.instance.itemDictionary.Keys)
-            //     {
-            //         Loadout.loadout[s] = 0;
-            //     }
-            // }
             // Updating to match current loadout in config
             Loadout.SetLoadoutFromString(Loadout.item_list.Value, true);
         }
@@ -91,11 +82,6 @@ static class LoadoutUI
         {
             MenuAPI.CreateREPOButton("LOAD PRESET", () =>
             {
-                foreach (string s in Loadout.loadouts)
-                {
-                    Loadout.Logger.LogMessage($"Preset: {s}");
-                }
-                Loadout.Logger.LogMessage($"Loading from {selected_loadout - 1}. Loadout count {Loadout.loadouts.Count}");
                 Loadout.SetLoadoutFromString(Loadout.loadouts[selected_loadout - 1], true);
                 foreach (string s in StatsManager.instance.itemDictionary.Keys)
                 {

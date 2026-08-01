@@ -26,9 +26,13 @@ public class Loadout : BaseUnityPlugin
 
     static public Dictionary<string, int> loadout = [];
 
+    public static bool IsEnabledAndMaster()
+    {
+        return mod_enabled.Value && SemiFunc.IsMasterClientOrSingleplayer();
+    }
+
     private static void ParsePresets()
     {
-        Logger.LogMessage($"Parsing presets string: {presets.Value}");
         List<string> preset_strings = presets.Value.Split("|").ToList();
         for (int i = 0; i < MAX_LOADOUTS; i++)
         {
@@ -38,7 +42,6 @@ public class Loadout : BaseUnityPlugin
             }
             else
             {
-                Logger.LogInfo($"Adding loadout {i}: {preset_strings[i]}");
                 loadouts.Add(preset_strings[i]);
             }
         }
@@ -70,6 +73,10 @@ public class Loadout : BaseUnityPlugin
 
     public static void SetLoadoutFromString(string l, bool use_stats = false)
     {
+        if (!IsEnabledAndMaster())
+        {
+            return;
+        }
         // ONLY USE THIS IF IN A GAME INSTANCE
         if (use_stats)
         {
