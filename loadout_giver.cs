@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 using WebSocketSharp;
 
-namespace givegun;
+namespace loadout;
 
 [HarmonyPatch(typeof(RunManager))]
-static class GiveGun_Giver
+static class LoadoutGiver
 {
     private const int ITEM_COUNT = 30;
     private static void SetItemMax(string item_name, int count)
@@ -29,14 +29,14 @@ static class GiveGun_Giver
             Dictionary<string, int> purchased = StatsManager.instance.itemsPurchased;
             int item_count = purchased.GetValueOrDefault(item_name, 0);
             purchased[item_name] = Math.Max(count, item_count);
-            GiveGun.Logger.LogMessage($"Spawning {count} {item_name}.");
+            Loadout.Logger.LogMessage($"Spawning {count} {item_name}.");
         }
     }
 
     [HarmonyPostfix, HarmonyPatch(nameof(RunManager.ChangeLevel))]
     private static void Patch()
     {
-        if (GiveGun.mod_enabled.Value && SemiFunc.IsMasterClientOrSingleplayer())
+        if (Loadout.mod_enabled.Value && SemiFunc.IsMasterClientOrSingleplayer())
         {
             // Do this regardless to make sure no existing loadouts are messed up
             foreach (KeyValuePair<string, Item> p in StatsManager.instance.itemDictionary)
@@ -47,7 +47,7 @@ static class GiveGun_Giver
             {
                 List<PlayerAvatar> players = SemiFunc.PlayerGetList();
                 int player_count = Math.Max(1, players.Count); // Use max and 1 here to cover offline SP bc idk if GetPlayerList() works there
-                foreach (KeyValuePair<string, int> p in GiveGun.loadout)
+                foreach (KeyValuePair<string, int> p in Loadout.loadout)
                 {
                     if (p.Value != 0)
                     {

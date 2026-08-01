@@ -4,31 +4,33 @@ using MenuLib;
 using MenuLib.MonoBehaviors;
 using UnityEngine;
 
-namespace givegun;
+namespace loadout;
 
-static class GiveGun_UI
+static class LoadoutUI
 {
+    private static int selected_loadout = 0;
+
     static private void FetchItems()
     {
-        if (GiveGun.mod_enabled.Value && SemiFunc.IsMasterClientOrSingleplayer())
+        if (Loadout.mod_enabled.Value && SemiFunc.IsMasterClientOrSingleplayer())
         {
-            if (GiveGun.loadout.Count == 0)
+            if (Loadout.loadout.Count == 0)
             {
-                GiveGun.Logger.LogMessage("Logging items.");
-                GiveGun.loadout = [];
+                Loadout.Logger.LogMessage("Logging items.");
+                Loadout.loadout = [];
                 foreach (string s in StatsManager.instance.itemDictionary.Keys)
                 {
-                    GiveGun.loadout[s] = 0;
+                    Loadout.loadout[s] = 0;
                 }
             }
             // Updating to match current loadout in config
-            string[] items = GiveGun.item_list.Value.Split(';');
+            string[] items = Loadout.item_list.Value.Split(';');
             foreach (string s in items)
             {
                 List<string> i = s.Split('#').ToList();
                 string item_name = i[0].TrimStart().TrimEnd();
                 int count = (i.Count > 1 && int.TryParse(i[1], out count)) ? count : -1;
-                GiveGun.loadout[i[0]] = count;
+                Loadout.loadout[i[0]] = count;
             }
         }
     }
@@ -36,6 +38,14 @@ static class GiveGun_UI
     static private void CreateItemEntries(REPOPopupPage menu)
     {
         menu.AddElementToScrollView(view => MenuAPI.CreateREPOSpacer(view, size: new Vector2(0, 20)).rectTransform);
+        menu.AddElementToScrollView(view =>
+            {
+                REPOSlider slider = MenuAPI.CreateREPOSlider("Preset", string.Empty, nv =>
+                {
+                    selected_loadout = nv;
+                }, view, default, 1, Loadout.MAX_LOADOUTS, selected_loadout);
+                return slider.rectTransform;
+            });
         menu.AddElementToScrollView(view =>
         {
             REPOLabel label = MenuAPI.CreateREPOLabel("Set an item quantity to -1 to spawn one for each player.", view, Vector2.zero);
@@ -49,12 +59,12 @@ static class GiveGun_UI
             {
                 REPOSlider slider = MenuAPI.CreateREPOSlider(s, string.Empty, nv =>
                 {
-                    int value = GiveGun.loadout[s];
+                    int value = Loadout.loadout[s];
                     if (int.TryParse(nv.ToString(), out value))
                     {
-                        GiveGun.loadout[s] = value;
+                        Loadout.loadout[s] = value;
                     }
-                }, view, default, -1, 20, GiveGun.loadout[s]);
+                }, view, default, -1, 20, Loadout.loadout[s]);
                 return slider.rectTransform;
             });
             menu.AddElementToScrollView(scrollView => MenuAPI.CreateREPOSpacer(scrollView, size: new Vector2(0, 10)).rectTransform);
@@ -70,7 +80,7 @@ static class GiveGun_UI
         menu.onEscapePressed += () =>
         {
             string new_list = "";
-            foreach (KeyValuePair<string, int> p in GiveGun.loadout)
+            foreach (KeyValuePair<string, int> p in Loadout.loadout)
             {
                 if (p.Value != 0)
                 {
@@ -78,10 +88,18 @@ static class GiveGun_UI
                     new_list += $"{p.Key}{quant};";
                 }
             }
-            GiveGun.item_list.Value = new_list;
+            Loadout.item_list.Value = new_list;
             return true;
         };
         CreateItemEntries(menu);
+        menu.AddElement(parent =>
+        {
+            MenuAPI.CreateREPOButton("SAVE PRESET", () => { }, parent, new Vector2(370f, 18f));
+        });
+        menu.AddElement(parent =>
+        {
+            MenuAPI.CreateREPOButton("LOAD PRESET", () => { }, parent, new Vector2(585f, 18f));
+        });
     }
 
     static public void CreateMenus()
