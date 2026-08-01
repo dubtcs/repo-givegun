@@ -1,14 +1,51 @@
-# Loadout
-A mod for REPO that spawns a loadout for the lobby on the starting round.
-## Install
-### Requirements
+Supplies a loadout of your choosing at the start of a run. Through the in game UI or config file, you can select items and their quantity to be spawned at the start of the first round.
 
- - BepInEx
- - MenuLib (for v1.3.0+)
+Only necessary for the host.
 
-Download and extract all of the contents into your ```REPO/bepinex/plugins``` folder.
-## Config
+## In Game UI
 
-An in game menu is available (v1.3.0+) in both the lobby menu and pause menu. Simply open it and set the quantity per item you wish to start with. *In singleplayer, you can only open the loadout menu in game. TO apply the loadout, simply restart the level.* An item quantity of ```-1``` will spawn one of said item for each player in the instance.
+You can access the in game UI from either the lobby screen or pause menu.
 
-Run the game once to create a config file. Inside the file you can set what items(s) you want to spawn. Separate items by semicolons. If you want to spawn a select number rather than for each player, add a hash symbol followed by the amount after each item. Example; ```Item Gun Handgun;Item Gun Shotgun#5;Item Gun Sledge Hammer``` will spawn a pistol and sledge hammer for each player with 5 sledge hammers.
+All items are set to 0 by default. Set an item quantity to -1 to spawn one for each player. A number > 0 will spawn exactly that many.
+
+**FOR SINGLEPLAYER (Not solo lobby):** Singleplayer can only access the UI from the pause menu. This means you must start a run, select your loadout, then restart the run to apply changes. Or just edit the config file.
+
+## Config File
+
+The mod config file will be named "shaboingboings.Loadout.cfg" located in the REPO/Bepinex/config folder. This config file will be changed by the in game UI, so any changes made in the file or UI will be reflected in the other.
+
+### Config syntax: 
+
+ - Item List: Separate each item with a semicolon. By default, one copy will be spawned for each player in the lobby. To spawn custom amounts, add a hash symbol followed by quantity.
+
+ - Preset List: Separate each preset with a vertical bar ```|```. Each preset should use the item list syntax above.
+
+Example: 
+
+```Item Gun Handgun;Item Gun Shotgun#2;Item Upgrade Player Grab Range#10```
+
+This config will spawn one handgun for each player, 2 shotguns, and 10 grab range upgrades.
+
+```Item Gun Handgun|Item Gun Handgun;Item Gun Shotgun#2;Item Upgrade Player Grab Range#10|```
+
+This config will create 2 presets, one with a handgun for each player, the other a copy of the item list above.
+
+A list of vanilla item names are supplied in the config file. Modded items will appear in the game UI exactly as they should be typed.
+
+## Requirements
+
+[BepInEx](https://github.com/bepinex/bepinex) - Releases are on the right side. Download the zip
+
+[MenuLib](https://thunderstore.io/c/repo/p/nickklmao/MenuLib/)
+
+## Installation
+
+Mod manager: Click download and let it do the work.
+
+Manual: Extract file contents into your REPO folder
+
+### **Extra**
+
+Here's the [Github](https://github.com/dubtcs/repo-givegun) if you want to check out the code. Viewing mod source is a great way to learn. Thanks for downloading and please let me know of any questions, issues, or additional features you'd like.
+
+ - shaboingboings
