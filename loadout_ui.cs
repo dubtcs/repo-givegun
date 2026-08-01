@@ -1,37 +1,31 @@
 using System.Collections.Generic;
-using System.Linq;
 using MenuLib;
 using MenuLib.MonoBehaviors;
+using SingularityGroup.HotReload;
 using UnityEngine;
 
 namespace loadout;
 
 static class LoadoutUI
 {
-    private static int selected_loadout = 0;
+    private static int selected_loadout = 1;
+    private static Dictionary<string, REPOSlider> sliders = [];
 
     static private void FetchItems()
     {
         if (Loadout.mod_enabled.Value && SemiFunc.IsMasterClientOrSingleplayer())
         {
-            if (Loadout.loadout.Count == 0)
-            {
-                Loadout.Logger.LogMessage("Logging items.");
-                Loadout.loadout = [];
-                foreach (string s in StatsManager.instance.itemDictionary.Keys)
-                {
-                    Loadout.loadout[s] = 0;
-                }
-            }
+            // if (Loadout.loadout.Count == 0)
+            // {
+            //     Loadout.Logger.LogMessage("Logging items.");
+            //     Loadout.loadout = [];
+            //     foreach (string s in StatsManager.instance.itemDictionary.Keys)
+            //     {
+            //         Loadout.loadout[s] = 0;
+            //     }
+            // }
             // Updating to match current loadout in config
-            string[] items = Loadout.item_list.Value.Split(';');
-            foreach (string s in items)
-            {
-                List<string> i = s.Split('#').ToList();
-                string item_name = i[0].TrimStart().TrimEnd();
-                int count = (i.Count > 1 && int.TryParse(i[1], out count)) ? count : -1;
-                Loadout.loadout[i[0]] = count;
-            }
+            Loadout.SetLoadoutFromString(Loadout.item_list.Value, true);
         }
     }
 
@@ -53,6 +47,7 @@ static class LoadoutUI
             return label.rectTransform;
         });
         menu.AddElementToScrollView(view => MenuAPI.CreateREPOSpacer(view, size: new Vector2(0, 20)).rectTransform);
+        sliders.Clear();
         foreach (string s in StatsManager.instance.itemDictionary.Keys)
         {
             menu.AddElementToScrollView(view =>
@@ -65,6 +60,7 @@ static class LoadoutUI
                         Loadout.loadout[s] = value;
                     }
                 }, view, default, -1, 20, Loadout.loadout[s]);
+                sliders[s] = slider;
                 return slider.rectTransform;
             });
             menu.AddElementToScrollView(scrollView => MenuAPI.CreateREPOSpacer(scrollView, size: new Vector2(0, 10)).rectTransform);
@@ -79,26 +75,33 @@ static class LoadoutUI
         menu.OpenPage(false);
         menu.onEscapePressed += () =>
         {
-            string new_list = "";
-            foreach (KeyValuePair<string, int> p in Loadout.loadout)
-            {
-                if (p.Value != 0)
-                {
-                    string quant = p.Value > 0 ? $"#{p.Value}" : "";
-                    new_list += $"{p.Key}{quant};";
-                }
-            }
-            Loadout.item_list.Value = new_list;
+            Loadout.item_list.Value = Loadout.GetLoadoutString();
             return true;
         };
         CreateItemEntries(menu);
         menu.AddElement(parent =>
         {
-            MenuAPI.CreateREPOButton("SAVE PRESET", () => { }, parent, new Vector2(370f, 18f));
+            MenuAPI.CreateREPOButton("SAVE PRESET", () =>
+            {
+                Loadout.loadouts[selected_loadout - 1] = Loadout.GetLoadoutString();
+                Loadout.SavePresets();
+            }, parent, new Vector2(370f, 18f));
         });
         menu.AddElement(parent =>
         {
-            MenuAPI.CreateREPOButton("LOAD PRESET", () => { }, parent, new Vector2(585f, 18f));
+            MenuAPI.CreateREPOButton("LOAD PRESET", () =>
+            {
+                foreach (string s in Loadout.loadouts)
+                {
+                    Loadout.Logger.LogMessage($"Preset: {s}");
+                }
+                Loadout.Logger.LogMessage($"Loading from {selected_loadout - 1}. Loadout count {Loadout.loadouts.Count}");
+                Loadout.SetLoadoutFromString(Loadout.loadouts[selected_loadout - 1], true);
+                foreach (string s in StatsManager.instance.itemDictionary.Keys)
+                {
+                    sliders[s].value = Loadout.loadout[s];
+                }
+            }, parent, new Vector2(585f, 18f));
         });
     }
 
