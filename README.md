@@ -21,6 +21,7 @@ The mod config file will be named "shaboingboings.Loadout.cfg" located in the RE
  - Preset List: Separate each preset with a vertical bar ```|```. Each preset should use the item list syntax above.
 
 Example: 
+
 ```Item Gun Handgun;Item Gun Shotgun#2;Item Upgrade Player Grab Range#10```
 
 This config will spawn one handgun for each player, 2 shotguns, and 10 grab range upgrades.
