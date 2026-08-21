@@ -26,6 +26,11 @@ public class Loadout : BaseUnityPlugin
 
     static public Dictionary<string, int> loadout = [];
 
+    public static bool IsHost()
+    {
+        return SemiFunc.IsMasterClientOrSingleplayer();
+    }
+
     public static bool IsEnabledAndMaster()
     {
         return mod_enabled.Value && SemiFunc.IsMasterClientOrSingleplayer();

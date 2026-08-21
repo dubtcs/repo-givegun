@@ -63,12 +63,24 @@ static class LoadoutUI
         else
         {
             menu.AddElementToScrollView(view => MenuAPI.CreateREPOSpacer(view, size: new Vector2(0, 20)).rectTransform);
-            menu.AddElementToScrollView(view =>
-                        {
-                            REPOLabel label = MenuAPI.CreateREPOLabel("Mod disabled, change in settings.", view, Vector2.zero);
-                            label.labelTMP.fontSize = 12;
-                            return label.rectTransform;
-                        });
+            if (Loadout.IsHost())
+            {
+                menu.AddElementToScrollView(view =>
+                            {
+                                REPOLabel label = MenuAPI.CreateREPOLabel("Mod disabled, change in settings.", view, Vector2.zero);
+                                label.labelTMP.fontSize = 12;
+                                return label.rectTransform;
+                            });
+            }
+            else
+            {
+                menu.AddElementToScrollView(view =>
+                            {
+                                REPOLabel label = MenuAPI.CreateREPOLabel("Only the host can apply loadout.", view, Vector2.zero);
+                                label.labelTMP.fontSize = 12;
+                                return label.rectTransform;
+                            });
+            }
             menu.AddElementToScrollView(view => MenuAPI.CreateREPOSpacer(view, size: new Vector2(0, 20)).rectTransform);
         }
     }
